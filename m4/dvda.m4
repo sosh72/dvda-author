@@ -244,7 +244,8 @@ AC_DEFINE_UNQUOTED(SOFTWARE, "$SOFTWARE_PATH", [Defining bn filepath])
 AC_DEFUN([DVDA_TEST_MAKE_VERSION],
 [
 AC_MSG_NOTICE([Testing make version...])
-AC_PATH_PROG(MAKE_PATH, [make], [], [$bindir:/bin:/usr/bin:/usr/local/bin])
+#AC_PATH_PROG(MAKE_PATH, [make], [], [$bindir:/bin:/usr/bin:/usr/local/bin])
+AC_PATH_PROG(MAKE_PATH, [make], [])
 #caution: quote [...]  regep square brackets
 AS_IF([test x$MAKE_PATH != x],
   [
