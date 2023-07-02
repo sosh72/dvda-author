@@ -106,6 +106,11 @@ int truncate_from_end(char* filename, uint64_t offset);
 
   typedef      HANDLE  FILE_DESCRIPTOR;
 
+  void close_handles(HANDLE g_hChildStd_IN_Rd,
+                     HANDLE g_hChildStd_IN_Wr,
+                     HANDLE g_hChildStd_ERR_Rd,
+                     HANDLE g_hChildStd_ERR_Wr);
+
   int pkill(const char* p);
   int kill(PROCESS_INFORMATION *pi);
 

@@ -1654,6 +1654,8 @@ int get_ats_audio(bool use_ifo_files, const extractlist *extract, globalData *gl
 
           if (globals->play)
             {
+#            ifdef _WIN32
+              // If I get this right, this call to close_handles() is only applicable on windows?!
               close_handles(g_hChildStd_IN_Rd,
                             g_hChildStd_IN_Wr,
                             g_hChildStd_ERR_Rd,
@@ -1661,7 +1663,7 @@ int get_ats_audio(bool use_ifo_files, const extractlist *extract, globalData *gl
 
               // + child process handles commented out
 
-#            ifdef _WIN32
+//#            ifdef _WIN32
               kill(piProcInfo);
 
 #            else
