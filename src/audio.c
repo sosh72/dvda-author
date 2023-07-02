@@ -1866,7 +1866,8 @@ inline static void interleave_sample_extended_merged(int channels, int count, ui
         {
           // TODO: fix bug here, S is not the right table, need 1 more dim
           permutation_merged(buf, _buf, 0, channels, S, size);
-          for (int w = 0; w < channels; ++w) buf[w] += i;
+          for (int w = 0; w < channels; ++w)
+            buf[w] += i;
         }
       break;
     }
@@ -2168,9 +2169,25 @@ out:
   return (buffer_increment);
 }
 
+
+int audio_close_merged(fileinfo_t *info, globalData *globals)
+{
+  if (globals->debugging)
+    for (int u = 0; u < info->channels; ++u)
+      foutput("%s %s\n", INF "Closing channel file", info->given_channel[u]);
+
+  if (info->type == AFMT_WAVE)
+    {
+      for (int u = 0; u < info->channels; ++u)
+        fclose(info->channel_fp[u]);
+    }
+  // info->audio[i][j] will be freed before exit in free_memory.
+  return (0);
+}
+
 int audio_close(fileinfo_t *info, globalData *globals)
 {
-  if (info->mergeflag) return audio_close_merged(info);
+  if (info->mergeflag) return audio_close_merged(info, globals);
 
   if (globals->debugging) foutput("%s %s\n", INF "Closing audio file", info->filename);
   if (info->type == AFMT_WAVE)
@@ -2342,18 +2359,3 @@ out:
   return (buffer_increment);
 }
 
-
-int audio_close_merged(fileinfo_t *info, globalData *globals)
-{
-  if (globals->debugging)
-    for (int u = 0; u < info->channels; ++u)
-      foutput("%s %s\n", INF "Closing channel file", info->given_channel[u]);
-
-  if (info->type == AFMT_WAVE)
-    {
-      for (int u = 0; u < info->channels; ++u)
-        fclose(info->channel_fp[u]);
-    }
-  // info->audio[i][j] will be freed before exit in free_memory.
-  return (0);
-}
