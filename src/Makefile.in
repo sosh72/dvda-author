@@ -27,13 +27,13 @@ include @BUILDDIR@/mk/libogg.global.mk
 DEBUG_FLAGS ?= @DEBUG_FLAGS@
 
 CFLAGS += -D_GNU_SOURCE
-LDFLAGS :=-L/usr/local/lib64 -L/usr/lib64
+LDFLAGS := $$(pkg-config --libs-only-L libswresample libavformat libavfilter libavcodec libavutil)
 
 ifeq "$(DEBUG_FLAGS)" ""
    LDFLAGS += -s
 endif
 
-CPPFLAGS :=-I@ROOTDIR@/libutils/src/include -I@ROOTDIR@/src/include
+CPPFLAGS :=-I@ROOTDIR@/libutils/src/include -I@ROOTDIR@/src/include -I/opt/local/include
 # for config.h
 CPPFLAGS += -I@BUILDDIR@
 LDLIBS := -lm @BUILDDIR@/libutils/src/libc_utils.a @BUILDDIR@/libfixwav/src/libfixwav.a
@@ -86,11 +86,8 @@ $(OBJECTS): %.o: @ROOTDIR@/src/%.c
 LDLIBS_append += $(foreach prog,$(STATIC_LIBS),$($(prog)_LIB) $($(prog)_LINK)) 
 
 LDLIBS += $(LDLIBS_append) \
-	  @ROOTDIR@/local/lib/libswresample.a \
-	  @ROOTDIR@/local/lib/libavformat.a \
-	  @ROOTDIR@/local/lib/libavfilter.a \
-	  @ROOTDIR@/local/lib/libavcodec.a \
-	  @ROOTDIR@/local/lib/libavutil.a @WINLIBS@
+	  $$(pkg-config --libs-only-l libswresample libavformat libavfilter libavcodec libavutil) \
+	  @WINLIBS@
 
 @PACKAGE_NAME@: $(OBJECTS) $(LDLIBS_append)
 

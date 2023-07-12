@@ -50,7 +50,9 @@ AS_CASE([${build}],
 		   WINLIBS=""])
 		  		  
 # probably spurious on most platforms yet useful on MSYS
-CPPFLAGS="$CPPFLAGS -I/usr/include -I/usr/local/include"
+#CPPFLAGS="$CPPFLAGS -I/usr/include -I/usr/local/include"
+CPPFLAGS="$CPPFLAGS -I/opt/local/include"
+
 #default configuration
 #by default, link, do not build, and use Ogg FLAC:
 FLAC_BUILD=no
