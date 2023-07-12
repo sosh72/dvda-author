@@ -1275,20 +1275,22 @@ inline static int write_pes_packet(FILE *fp,
   // new file to previous file's last pack are not taken into consideration
   // for first_PTS assignment.
 
-  if (start_of_file)
+  if (pack_in_title == 0 || wait_for_next_pack)
     {
-      if (pack_in_title == 0 || wait_for_next_pack)
-        {
-          info->first_PTS = PTS;
-          wait_for_next_pack = false;
-        }
-      else
-        wait_for_next_pack = true;
+      info->first_PTS = PTS;
+      wait_for_next_pack = false;
+      foutput(INF "Setting first_PTS=%d\n", PTS);
+    }
+  else if (start_of_file)
+    {	
+      wait_for_next_pack = true;
+      foutput(INF "Have started new file at pack=%"PRIu64"\n", pack_in_title);
     }
 
   if (pack_in_title == 0)
     {
       cc = 0;          // First packet in title
+
       foutput(INF "Writing first packet - pack=%"PRIu64", bytesinbuffer=%d\n",
               pack_in_title, bytesinbuffer);
 
