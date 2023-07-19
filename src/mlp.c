@@ -142,10 +142,18 @@ int decode_mlp_file(fileinfo_t *info, globalData *globals)
   AVCodecContext *context;
   AVStream *stream;
   AVCodecParameters *codecpar;
-  AVPacket packet;
+  AVPacket *packet;
 
   FILE *fp_in = NULL;
   FILE *fp_out = NULL;
+
+  packet = av_packet_alloc();
+  if (!packet)
+  { 
+    fprintf(stderr,
+            ERR "Could not allocate memory\n");
+    EXIT_ON_RUNTIME_ERROR
+  }
 
   // get format from audio file
   format = avformat_alloc_context();
@@ -222,7 +230,8 @@ int decode_mlp_file(fileinfo_t *info, globalData *globals)
 
   // prepare to read data
 
-  av_init_packet(&packet);
+  // deprecated:
+  //  av_init_packet(&packet);
 
   int64_t cumbytes_written = 0;
 
@@ -342,7 +351,7 @@ int decode_mlp_file(fileinfo_t *info, globalData *globals)
           int ret;
 
           ret = av_parser_parse2(parser, context,
-                                 &packet.data, &packet.size,
+                                 &(packet->data), &(packet->size),
                                  data, data_size,
                                  AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 
@@ -355,9 +364,9 @@ int decode_mlp_file(fileinfo_t *info, globalData *globals)
           data      += ret;
           data_size -= ret;
 
-          if (packet.size)
+          if (packet->size)
             cumbytes_written = decode(context, codec,
-                                      codecpar, &packet,
+                                      codecpar, packet,
                                       frame, fp_out,
                                       info, cumbytes_written,
                                       globals);
@@ -375,11 +384,11 @@ int decode_mlp_file(fileinfo_t *info, globalData *globals)
 
       // Flush
 
-      packet.data = NULL;
-      packet.size = 0;
+      packet->data = NULL;
+      packet->size = 0;
 
       decode(context, codec,
-             codecpar, &packet,
+             codecpar, packet,
              frame, fp_out,
              info, cumbytes_written,
              globals);
@@ -464,7 +473,7 @@ int decode_mlp_file(fileinfo_t *info, globalData *globals)
           int ret;
 
           ret = av_parser_parse2(parser, context,
-                                 &packet.data, &packet.size,
+                                 &(packet->data), &(packet->size),
                                  data, data_size,
                                  AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 
@@ -477,9 +486,9 @@ int decode_mlp_file(fileinfo_t *info, globalData *globals)
           data      += ret;
           data_size -= ret;
 
-          if (packet.size)
+          if (packet->size)
             cumbytes_written = decode(context, codec, codecpar,
-                                      &packet, frame, NULL,
+                                      packet, frame, NULL,
                                       info, cumbytes_written,
                                       globals);
 
@@ -552,6 +561,7 @@ clean_up:
   av_frame_free(&frame);
   avcodec_close(context);
   avformat_free_context(format);
+  av_packet_free(&packet);
 
   return errno;
 }
